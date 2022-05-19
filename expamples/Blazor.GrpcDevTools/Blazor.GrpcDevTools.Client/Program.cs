@@ -1,0 +1,33 @@
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Blazor.GrpcDevTools.Client;
+using Grpc.Net.Client;
+using Grpc.Net.Client.Web;
+using MudBlazor.Services;
+using Blazor.GrpcDevTools.Shared.Services;
+using Blazor.GrpcWeb.DevTools;
+
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+var backendUrl = builder.Configuration["Api:BackendUrl"] ?? builder.HostEnvironment.BaseAddress;
+
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
+builder.Services.AddScoped(services =>
+{
+    var channel = GrpcChannel.ForAddress(backendUrl, 
+        new GrpcChannelOptions 
+        { 
+            HttpHandler = new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()) 
+        });
+
+    return channel;
+});
+
+builder.Services.AddGrpcServiceWithDevTools<IConferencesService>();
+builder.Services.AddGrpcServiceWithDevTools<ITimeService>();
+
+builder.Services.AddMudServices();
+
+await builder.Build().RunAsync();

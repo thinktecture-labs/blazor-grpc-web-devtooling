@@ -1,0 +1,23 @@
+﻿@page "/"
+@using Blazor.GrpcDevTools.Shared.DTO
+
+@if (_conferences != null)
+{
+    <MudTable @ref="mudTable" 
+              T="ConferenceOverview"
+              Items="@_conferences" 
+              Virtualize="true" 
+              Hover="true" 
+              Breakpoint="Breakpoint.Sm" 
+              RowClassFunc="@SelectedRowClassFunc" 
+              OnRowClick="RowClickEvent">
+        <HeaderContent>
+            <MudTh>ID</MudTh>
+            <MudTh>Title</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr">@context.ID</MudTd>
+            <MudTd DataLabel="Sign">@context.Title</MudTd>
+        </RowTemplate>
+    </MudTable>
+}

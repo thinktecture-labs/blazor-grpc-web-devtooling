@@ -1,0 +1,12 @@
+﻿@page "/conferences/{Id:guid}"
+
+@if (_conference != null)
+{
+    <EditForm Model="_conference" OnValidSubmit="SaveConference">
+        <div class="d-flex flex-column full-width" style="gap: 1rem;">
+            <MudTextField Label="Title" @bind-Value="_conference.Title"></MudTextField>
+        </div>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit">Save</MudButton>
+    </EditForm>
+}
