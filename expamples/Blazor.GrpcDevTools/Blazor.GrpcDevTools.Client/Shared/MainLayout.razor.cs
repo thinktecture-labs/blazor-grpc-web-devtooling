@@ -1,24 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using Microsoft.JSInterop;
-using MudBlazor;
-using Blazor.GrpcDevTools.Client;
-using Blazor.GrpcDevTools.Client.Shared;
-using Grpc.Net.Client;
 using Blazor.GrpcDevTools.Shared.Services;
-using Blazor.GrpcWeb.DevTools;
 using Grpc.Core;
 using ProtoBuf.Grpc;
+using MudBlazor;
 
 namespace Blazor.GrpcDevTools.Client.Shared
 {
@@ -28,6 +12,28 @@ namespace Blazor.GrpcDevTools.Client.Shared
 
         private string _time = "";
         private CancellationTokenSource? _cts;
+
+        private static readonly MudTheme DefaultTheme = new()
+        {
+            Palette = new Palette
+            {
+                Black = "#272c34",
+                AppbarBackground = "#ffffff",
+                AppbarText = "#ff584f",
+                DrawerBackground = "#ff584f",
+                DrawerText = "ffffff",
+                DrawerIcon = "ffffff",
+                Primary = "#ff584f",
+                Secondary = "#3d6fb4"
+            },
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" }
+                }
+            }
+        };
 
         protected override async Task OnInitializedAsync()
         {

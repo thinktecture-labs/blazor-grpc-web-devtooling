@@ -54,7 +54,22 @@ public class ConferencesService : IConferencesService
 
         if (conferenceDetails != null)
         {
-            conferenceDetails.Title = request.Title;
+            conferenceDetails.Title = request.Conference.Title;
+            conferenceDetails.DateFrom = request.Conference.DateFrom ?? DateTime.Now;
+            conferenceDetails.DateTo = request.Conference.DateTo ?? DateTime.Now;
+            conferenceDetails.City = request.Conference.City;
+            conferenceDetails.Country = request.Conference.Country;
+            await _conferencesDbContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeleteConferenceAsync(ConferenceDetailsRequest request)
+    {
+        var conferenceDetails = await _conferencesDbContext.Conferences.FindAsync(request.ID);
+
+        if (conferenceDetails != null)
+        {
+            _conferencesDbContext.Remove(conferenceDetails);
             await _conferencesDbContext.SaveChangesAsync();
         }
     }

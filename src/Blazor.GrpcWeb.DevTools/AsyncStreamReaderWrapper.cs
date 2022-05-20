@@ -5,6 +5,10 @@ namespace Blazor.GrpcWeb.DevTools;
 
 public partial class GrpcMessageInterceptor
 {
+    /// <summary>
+    /// StreamReader wrapper, which passes the stream responses to the gRPC Developer Tools.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class AsyncStreamReaderWrapper<T> : IAsyncStreamReader<T>
     {
         private readonly IAsyncStreamReader<T> _asyncStreamReader;

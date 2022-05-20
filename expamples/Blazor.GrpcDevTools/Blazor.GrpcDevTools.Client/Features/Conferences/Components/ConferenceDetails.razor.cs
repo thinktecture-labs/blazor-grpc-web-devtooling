@@ -1,8 +1,7 @@
 using Blazor.GrpcDevTools.Shared.DTO;
 using Blazor.GrpcDevTools.Shared.Services;
-using Grpc.Net.Client;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using MudBlazor;
 
 namespace Blazor.GrpcDevTools.Client.Features.Conferences.Components
 {
@@ -11,19 +10,39 @@ namespace Blazor.GrpcDevTools.Client.Features.Conferences.Components
         [Inject] private IConferencesService _conferencesService { get; set; } = default!;
         [Inject] private NavigationManager _navigationManager { get; set; } = default!;
 
-        [Parameter] public Guid Id { get; set; }
+        [Parameter] public Guid? Id { get; set; }
+        [Parameter] public string Mode { get; set; } = string.Empty;
 
         private ConferenceDetailModel? _conference;
+        private DateRange? _dateRange;
+        private bool _isNew => Mode == "new";
         protected override async Task OnInitializedAsync()
         {
-            _conference = await _conferencesService.GetConferenceDetailsAsync(new ConferenceDetailsRequest { ID = Id });
+            if (_isNew)
+            {
+                _conference = new ConferenceDetailModel();
+            } 
+            else if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                _conference = await _conferencesService.GetConferenceDetailsAsync(new ConferenceDetailsRequest { ID = Id.Value });
+                _dateRange = new DateRange(_conference.DateFrom, _conference.DateTo);
+            }            
             await base.OnInitializedAsync();
         }
 
         private async Task SaveConference()
         {
-            await _conferencesService.UpdateConferenceAsync(
-                new ConferenceUpdateRequest { ID = Id, Title = _conference?.Title ?? string.Empty });
+            _conference!.DateFrom = _dateRange!.Start;
+            _conference!.DateTo = _dateRange!.End;
+            if (_isNew)
+            {
+                await _conferencesService.AddNewConferenceAsync(_conference);
+            }
+            else if (Id.HasValue && Id.Value != Guid.Empty)
+            {                
+                await _conferencesService.UpdateConferenceAsync(
+                    new ConferenceUpdateRequest { ID = Id.Value, Conference = _conference });
+            }
             _navigationManager.NavigateTo("/");
         }
 

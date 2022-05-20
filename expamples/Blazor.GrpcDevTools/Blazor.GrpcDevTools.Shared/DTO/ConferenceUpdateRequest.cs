@@ -9,6 +9,6 @@ namespace Blazor.GrpcDevTools.Shared.DTO
         public Guid ID { get; set; }
 
         [DataMember(Order = 2)]
-        public string Title { get; set; } = string.Empty;
+        public ConferenceDetailModel Conference { get; set; }
     }
 }

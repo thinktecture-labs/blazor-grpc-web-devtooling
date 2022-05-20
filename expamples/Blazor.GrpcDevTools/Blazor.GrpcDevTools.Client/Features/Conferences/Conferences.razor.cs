@@ -1,3 +1,4 @@
+using Blazor.GrpcDevTools.Client.Features.Shared.Dialogs;
 using Blazor.GrpcDevTools.Shared.DTO;
 using Blazor.GrpcDevTools.Shared.Services;
 using Microsoft.AspNetCore.Components;
@@ -9,9 +10,8 @@ namespace Blazor.GrpcDevTools.Client.Features.Conferences
     {
         [Inject] private IConferencesService _conferencesService { get; set; } = default!;
         [Inject] private NavigationManager _navigationManager { get; set; } = default!;
+        [Inject] private IDialogService _dialogService { get; set; } = default!;
 
-        private int selectedRowNumber = -1;
-        private MudTable<ConferenceOverview>? mudTable;
         private List<ConferenceOverview>? _conferences;
 
         protected override async Task OnInitializedAsync()
@@ -20,26 +20,29 @@ namespace Blazor.GrpcDevTools.Client.Features.Conferences
             await base.OnInitializedAsync();
         }
 
-        private void RowClickEvent(TableRowClickEventArgs<ConferenceOverview> tableRowClickEventArgs)
+        private void AddConference()
         {
-            _navigationManager.NavigateTo($"/conferences/{tableRowClickEventArgs.Item.ID}");
+            _navigationManager.NavigateTo($"/conferences/new");
         }
 
-        private string SelectedRowClassFunc(ConferenceOverview conf, int rowNumber)
+        private void EditConference(Guid id)
         {
-            if (selectedRowNumber == rowNumber)
+            _navigationManager.NavigateTo($"/conferences/edit/{id}");
+        }
+
+        private async Task DeleteConference(Guid id, string title)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add(nameof(ConfirmDialog.ContentText), $"Are you sure you want to remove {title}?");
+            parameters.Add(nameof(ConfirmDialog.ButtonText), "Yes");
+            parameters.Add(nameof(ConfirmDialog.Color), Color.Success);
+
+            var reference = _dialogService.Show<ConfirmDialog>("Delete", parameters);
+            var result = await reference.Result;
+            if (result.Data is bool confirmed && confirmed)
             {
-                selectedRowNumber = -1;
-                return string.Empty;
-            }
-            else if (mudTable?.SelectedItem != null && mudTable.SelectedItem.Equals(conf))
-            {
-                selectedRowNumber = rowNumber;
-                return "selected";
-            }
-            else
-            {
-                return string.Empty;
+                await _conferencesService.DeleteConferenceAsync(new ConferenceDetailsRequest() { ID = id });
+                _conferences = (await _conferencesService.ListConferencesAsync()).ToList();
             }
         }
     }

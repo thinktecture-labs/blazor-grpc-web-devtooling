@@ -10,4 +10,5 @@ public interface IConferencesService
     Task<ConferenceDetailModel> GetConferenceDetailsAsync(ConferenceDetailsRequest request);
     Task<ConferenceDetailModel> AddNewConferenceAsync(ConferenceDetailModel conference);
     Task UpdateConferenceAsync(ConferenceUpdateRequest request);
+    Task DeleteConferenceAsync(ConferenceDetailsRequest request);
 }

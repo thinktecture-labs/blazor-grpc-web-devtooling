@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider Theme="DefaultTheme"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
@@ -11,7 +11,7 @@
         <MudText Typo="Typo.body1">@_time</MudText>
     </MudAppBar>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        <MudContainer Class="py-4" MaxWidth="MaxWidth.ExtraLarge">
             @Body
         </MudContainer>
     </MudMainContent>

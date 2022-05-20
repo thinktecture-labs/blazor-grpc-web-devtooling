@@ -8,6 +8,11 @@ namespace Blazor.GrpcWeb.DevTools
 {
     public static class GrpcWebDevToolsExtensions
     {
+        /// <summary>
+        /// Registers a gRPC service in the servicecollection, which passes the requests and responses to the gRPC Web Developer Tools.
+        /// </summary>
+        /// <typeparam name="TService">gRPC Service Type</typeparam>
+        /// <param name="services">IServiceCollection</param>
         public static void AddGrpcServiceWithDevTools<TService>(this IServiceCollection services)
             where TService : class
         {
@@ -21,7 +26,7 @@ namespace Blazor.GrpcWeb.DevTools
             });
         }
 
-        internal static async Task HandleGrpcRequest<TRequest, TResponse>(this IJSRuntime jsRuntime, string method, string methodType, TRequest request, TResponse response)
+        internal static async Task HandleGrpcRequest<TRequest, TResponse>(this IJSRuntime jsRuntime, string method, TRequest request, TResponse response)
         {
             Console.WriteLine($"HandleGrpcRequest: {method}");
             await jsRuntime.InvokeVoidAsync("postMessage", new GrpcDevToolsCall<TRequest, TResponse>("__GRPCWEB_DEVTOOLS__", method, "unary", request, response));

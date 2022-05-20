@@ -4,7 +4,7 @@
     "Blazor.GrpcDevTools.WebApi": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7272;http://localhost:5222",
       "environmentVariables": {

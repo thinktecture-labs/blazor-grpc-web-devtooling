@@ -4,9 +4,9 @@ using Microsoft.JSInterop;
 
 namespace Blazor.GrpcWeb.DevTools;
 
-public record GrpcDevToolsCall<TRequest, TRepsonse>(string type, string method, string methodType, TRequest request, TRepsonse response);
-public record GrpcDevToolsServerRequest<TRequest>(string type, string method, string methodType, TRequest request);
-public record GrpcDevToolsServerResponse<TRepsonse>(string type, string method, string methodType, TRepsonse response);
+internal record GrpcDevToolsCall<TRequest, TRepsonse>(string type, string method, string methodType, TRequest request, TRepsonse response);
+internal record GrpcDevToolsServerRequest<TRequest>(string type, string method, string methodType, TRequest request);
+internal record GrpcDevToolsServerResponse<TRepsonse>(string type, string method, string methodType, TRepsonse response);
 
 public partial class GrpcMessageInterceptor : Interceptor
 {
@@ -27,14 +27,15 @@ public partial class GrpcMessageInterceptor : Interceptor
         var call = continuation(request, context);
 
         return new AsyncUnaryCall<TResponse>(
-            HandleUnaryCall(context.Method.Name, context.Method.Type.ToString(), request, call.ResponseAsync),
+            HandleUnaryCall(context.Method.Name, request, call.ResponseAsync),
             call.ResponseHeadersAsync,
             call.GetStatus,
             call.GetTrailers,
             call.Dispose);
     }
 
-    public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
+    public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, 
+        AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
     {
         var streamingCall = base.AsyncServerStreamingCall(request, context, continuation);
 
@@ -60,12 +61,12 @@ public partial class GrpcMessageInterceptor : Interceptor
         }
     }
 
-    private async Task<TResponse> HandleUnaryCall<TResponse, TRequest>(string method, string methodType, TRequest request, Task<TResponse> inner)
+    private async Task<TResponse> HandleUnaryCall<TResponse, TRequest>(string method, TRequest request, Task<TResponse> inner)
     {
         try
         {
             var result = await inner;
-            await _jsRuntime.HandleGrpcRequest(method, methodType, request, result);
+            await _jsRuntime.HandleGrpcRequest(method, request, result);
             return result;
         }
         catch (Exception ex)
