@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using ProtoBuf.Grpc.Client;
@@ -12,6 +13,7 @@ namespace Blazor.GrpcWeb.DevTools
         private const string GrpcWebDevToolsExtensionName = "__GRPCWEB_DEVTOOLS__";
         private const string GrpcUnaryMethodName = "unary";
         private const string GrpcServerStreamingMethodName = "server_streaming";
+        private const string GrpcDevToolsSettingsKey = "GrpcDevToolsEnabled";
 
         /// <summary>
         /// Registers a gRPC service in the servicecollection.
@@ -27,6 +29,24 @@ namespace Blazor.GrpcWeb.DevTools
                 var invoker = serviceProvider.GetService<CallInvoker>();
                 if (invoker != null)
                     return GrpcClientFactory.CreateGrpcService<TService>(invoker);
+
+                try
+                {
+                    var enabled = serviceProvider.GetRequiredService<IConfiguration>()?.GetValue<bool>(GrpcDevToolsSettingsKey);
+                    if (enabled.HasValue && enabled.Value)
+                    {
+                        if (invoker == null)
+                        {
+                            var jsRuntime = serviceProvider.GetService<IJSRuntime>();
+                            invoker = serviceProvider.GetService<GrpcChannel>().Intercept(new GrpcMessageInterceptor(jsRuntime));
+                        }
+                        return GrpcClientFactory.CreateGrpcService<TService>(invoker);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Something went wrong by register gRPC invoker. Error: {e.Message}");
+                }
 
                 var channel = serviceProvider.GetService<GrpcChannel>();
                 return GrpcClientFactory.CreateGrpcService<TService>(channel);

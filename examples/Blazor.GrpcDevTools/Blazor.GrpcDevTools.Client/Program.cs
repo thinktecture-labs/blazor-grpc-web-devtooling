@@ -25,8 +25,7 @@ builder.Services.AddScoped(services =>
     return channel;
 });
 
-// IMPORTANT: must called before register GrpcServices
-builder.Services.EnableGrpcWebDevTools();
+
 
 builder.Services.AddGrpcService<IConferencesService>();
 builder.Services.AddGrpcService<ITimeService>();
