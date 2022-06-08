@@ -21,13 +21,18 @@ builder.Services.AddScoped(services =>
         { 
             HttpHandler = new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()) 
         });
-
+        
     return channel;
 });
 
-builder.Services.AddGrpcServiceWithDevTools<IConferencesService>();
-builder.Services.AddGrpcServiceWithDevTools<ITimeService>();
+// IMPORTANT: must called before register GrpcServices
+builder.Services.EnableGrpcWebDevTools();
+
+builder.Services.AddGrpcService<IConferencesService>();
+builder.Services.AddGrpcService<ITimeService>();
 
 builder.Services.AddMudServices();
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+
+await app.RunAsync();
